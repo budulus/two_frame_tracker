@@ -1,12 +1,14 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, QLabel,
                              QFileDialog, QHBoxLayout, QVBoxLayout, QSlider,
-                             QMainWindow, QGraphicsView, QGraphicsScene, QAction)
+                             QMainWindow, QGraphicsView, QGraphicsScene, QAction,
+                             QScrollBar)
 from PyQt5.QtGui import QPixmap, QImage, QPainter, QPen, QColor
-from PyQt5.QtCore import Qt, QPointF, pyqtSignal
+from PyQt5.QtCore import Qt, QPointF, pyqtSignal, QRectF
 import cv2
 import numpy as np
 from matplotlib import cm
+
 
 class ClickableGraphicsView(QGraphicsView):
     point_clicked = pyqtSignal(QPointF)
@@ -14,12 +16,20 @@ class ClickableGraphicsView(QGraphicsView):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMouseTracking(True)
+        self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
+        self.setResizeAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+
 
     def mousePressEvent(self, event):
         scene_pos = self.mapToScene(event.pos())
         self.point_clicked.emit(scene_pos)
         super().mousePressEvent(event)
 
+    def wheelEvent(self, event):
+        zoom_factor = 1.15 if event.angleDelta().y() > 0 else 1 / 1.15
+        self.scale(zoom_factor, zoom_factor)
 
 class ImageViewer(QMainWindow):
     def __init__(self):
@@ -52,6 +62,10 @@ class ImageViewer(QMainWindow):
         load_deformed_action = QAction("Load Deformed Image", self)
         load_deformed_action.triggered.connect(self.load_deformed_image)
         file_menu.addAction(load_deformed_action)
+
+        save_transformed_action = QAction("Save Transformed Image As",self)
+        save_transformed_action.triggered.connect(self.save_transformed_image)
+        file_menu.addAction(save_transformed_action)
 
     def init_ui(self):
         main_layout = QHBoxLayout()
@@ -109,7 +123,7 @@ class ImageViewer(QMainWindow):
 
         main_layout.addLayout(image_layout)
         main_layout.addLayout(control_layout)
-        
+
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
@@ -154,6 +168,7 @@ class ImageViewer(QMainWindow):
              self.deformed_points.append(point)
              self.draw_points(self.deformed_scene, self.deformed_points, "blue")
              self.update_ui_state()
+
     def draw_points(self, scene, points, color):
         scene_pen = QPen(QColor(color))
         scene_pen.setWidth(4)
@@ -175,6 +190,7 @@ class ImageViewer(QMainWindow):
             and self.overlay_image is not None
         )
         self.view_result_button.setEnabled(enable_view)
+
 
     def calculate_affine_map(self):
         src_pts = np.float32([[p.x(), p.y()] for p in self.reference_points])
@@ -202,9 +218,7 @@ class ImageViewer(QMainWindow):
         if self.overlay_image is not None:
           self.display_result(self.overlay_image,self.deformed_image)
 
-
     def display_result(self, overlay, background):
-
         height, width = background.shape
         combined_image = np.zeros((height, width, 4), dtype=np.uint8)
 
@@ -232,6 +246,7 @@ class ImageViewer(QMainWindow):
         self.result_view.fitInView(self.result_scene.itemsBoundingRect(), Qt.KeepAspectRatio)
         self.result_view.setSceneRect(self.result_scene.itemsBoundingRect())
         self.result_view.update()
+
     def view_result(self):
         if self.overlay_image is None or self.deformed_image is None:
             print("No overlay or deformed image to show")
@@ -249,6 +264,19 @@ class ImageViewer(QMainWindow):
 
         self.result_window.setCentralWidget(self.result_view)
         self.result_window.show()
+
+    def save_transformed_image(self):
+        if self.overlay_image is None:
+             print("No transformed image to save.")
+             return
+
+        file_path, _ = QFileDialog.getSaveFileName(self, "Save Transformed Image", "", "Image Files (*.png *.jpg *.bmp *.tif)")
+        if file_path:
+            try:
+                cv2.imwrite(file_path, self.overlay_image)
+                print(f"Transformed image saved to: {file_path}")
+            except Exception as e:
+                print(f"Error saving transformed image: {e}")
 
 
 if __name__ == "__main__":
