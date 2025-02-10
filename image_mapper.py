@@ -177,7 +177,7 @@ class ImageViewer(QMainWindow):
         scene_pen = QPen(QColor(color))
         scene_pen.setWidth(4)
         for point in points:
-            scene.addEllipse(point.x() - 5, point.y() - 5, 3, 2, scene_pen, QColor(color))
+            scene.addEllipse(point.x() - 5, point.y() - 5, 1, 1, scene_pen, QColor(color))
 
     def update_ui_state(self):
         enable_calculate = (
