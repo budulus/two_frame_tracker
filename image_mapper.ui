@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Image Affine Mapping Tool</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+    <item>
+     <layout class="QHBoxLayout" name="imageLayout">
+      <!-- Left side - Reference Image -->
+      <item>
+       <widget class="QGroupBox" name="referenceGroup">
+        <property name="title">
+         <string>Reference Image</string>
+        </property>
+        <layout class="QVBoxLayout" name="referenceLayout">
+         <item>
+          <widget class="QPushButton" name="load_reference_button">
+           <property name="text">
+            <string>Load Reference Image</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ClickableGraphicsView" name="reference_view">
+           <property name="minimumSize">
+            <size>
+             <width>500</width>
+             <height>500</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <!-- Right side - Deformed Image -->
+      <item>
+       <widget class="QGroupBox" name="deformedGroup">
+        <property name="title">
+         <string>Deformed Image</string>
+        </property>
+        <layout class="QVBoxLayout" name="deformedLayout">
+         <item>
+          <widget class="QPushButton" name="load_deformed_button">
+           <property name="text">
+            <string>Load Deformed Image</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ClickableGraphicsView" name="deformed_view">
+           <property name="minimumSize">
+            <size>
+             <width>500</width>
+             <height>500</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <!-- Bottom Controls -->
+    <item>
+     <widget class="QGroupBox" name="controlsGroup">
+      <property name="title">
+       <string>Controls</string>
+      </property>
+      <layout class="QHBoxLayout" name="controlsLayout">
+       <item>
+        <layout class="QVBoxLayout" name="buttonLayout">
+         <item>
+          <widget class="QPushButton" name="calculate_button">
+           <property name="text">
+            <string>Calculate Affine Map</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="view_result_button">
+           <property name="text">
+            <string>View Result</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="save_all_button">
+           <property name="text">
+            <string>Save All</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="opacityLayout">
+         <item>
+          <widget class="QLabel" name="opacity_title">
+           <property name="text">
+            <string>Overlay Opacity:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="opacity_slider">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="value">
+            <number>50</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="opacity_label">
+           <property name="text">
+            <string>0.50</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="affine_table">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>400</width>
+           <height>120</height>
+          </size>
+         </property>
+         <row>
+          <property name="text">
+           <string>x</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>y</string>
+          </property>
+         </row>
+         <column>
+          <property name="text">
+           <string>A</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>A</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>b</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1200</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="load_reference_action"/>
+    <addaction name="load_deformed_action"/>
+    <addaction name="save_transformed_action"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <action name="load_reference_action">
+   <property name="text">
+    <string>Load Reference Image...</string>
+   </property>
+  </action>
+  <action name="load_deformed_action">
+   <property name="text">
+    <string>Load Deformed Image...</string>
+   </property>
+  </action>
+  <action name="save_transformed_action">
+   <property name="text">
+    <string>Save Transformed Image As...</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ClickableGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>image_mapper</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
